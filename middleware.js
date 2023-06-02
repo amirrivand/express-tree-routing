@@ -33,7 +33,7 @@ function treeRoutingMiddleware(baseDirectory, baseRouter, dotMiddlewares = []) {
 				}
 			}
 
-			middlewares.push(registerRoutes(itemPath, subDirectoryRouter));
+			middlewares.push(treeRoutingMiddleware(itemPath, subDirectoryRouter, dotMiddlewares));
 			baseRouter.use(`/${item}`, middlewares);
 		}
 
