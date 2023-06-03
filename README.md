@@ -1,4 +1,4 @@
-# Express Tree Routing Middleware
+# Express Tree Routing Module
 
 [![npm version](https://badge.fury.io/js/express-tree-routing.svg)](https://badge.fury.io/js/express-tree-routing)
 
@@ -23,16 +23,21 @@ npm install express-tree-routing
 ```shell
 const express = require('express');
 const treeRouting = require('express-tree-routing');
+const path = require("path");
 
 const app = express();
 const router = express.Router();
 
+// Specify the base directory of your routers
+const baseDirectory = path.join(__dirname, "routers");
+
 // Configure tree routing module
-const baseDirectory = __dirname; // Specify the base directory of your project
-treeRouting(baseDirectory, router);
+const registeredRoutes = treeRouting(baseDirectory, router);
 
 // Attach the router to your Express app
-app.use(router);
+app.use(registeredRoutes);
+// or
+app.use("/api", registeredRoutes);
 
 // Start the server
 app.listen(3000, () => {
@@ -50,22 +55,38 @@ Let's consider the following directory structure:
 │   │   ├── middleware.js
 │   │   └── index.js
 │   ├── posts
+|   |   ├── :POST_ID
+|   |   |   ├── comments
+|   |   |   |   ├── :COMMENT_ID
+|   |   |   |   |   ├── replies
+|   |   |   |   |   |   ├── :REPLY_ID.js
+|   |   |   |   |   |   └── index.js
+|   |   |   |   |   └── index.js
+|   |   |   └── author.js
 │   │   ├── middleware.js
-│   │   ├── index.js
-│   │   └── comments
-│   │       └── index.js
+│   │   └── index.js
 │   ├── middleware.js
+│   ├── tuturials.js
 │   └── index.js
 ```
 
-- Each directory represents a route, and the corresponding index.js file inside the directory defines the route handlers.
+- Each directory represents a route, and the corresponding index.js file inside the directory defines the index route.
 - The middleware.js files contain middleware specific to that directory or route.
-- The routes/middleware.js file contains middleware that applies to all routes.
+- The routes/middleware.js file contains middleware that applies to all routes in that directory.
 
-The `treeRouting` function will automatically scan this directory structure and configure the routes and middleware accordingly.
+Each file in directories except `middleware.js` (example: index.js, comments.js) must return the router which passed to it by module as below:
+
+```shell
+module.exports = (router) => {
+  router.get(/* arguments */);
+  return router;
+}
+```
+
+The `treeRouting` function will automatically scan base directory structure and configure the routes and middleware accordingly.
 
 For a detailed guide on organizing your project's directory structure and configuring routes and middleware using Express Tree Routing Middleware, please refer to the [documentation](https://github.com/amirrivand/express-tree-routing/docs).
 
-
 ## **Contributing**
+
 Contributions are welcome! Please feel free to submit any bug fixes, enhancements, or feature requests via GitHub issues and pull requests.
