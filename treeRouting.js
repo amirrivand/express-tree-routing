@@ -1,6 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const { Router } = require("express");
+const { sortDirectoryListing } = require("./utils/sorter");
 
 /**
  *
@@ -15,7 +16,7 @@ function treeRoutingMiddleware(baseDirectory, baseRouter, dotMiddlewares = []) {
 		.readdirSync(baseDirectory)
 		.filter((item) => ["middleware.js"].indexOf(item) === -1);
 
-	listCurrentDirectory.forEach((item) => {
+	listCurrentDirectory.sort(sortDirectoryListing).forEach((item) => {
 		const itemPath = path.join(baseDirectory, item);
 		const itemStatus = fs.statSync(itemPath);
 
@@ -33,7 +34,9 @@ function treeRoutingMiddleware(baseDirectory, baseRouter, dotMiddlewares = []) {
 				}
 			}
 
-			middlewares.push(treeRoutingMiddleware(itemPath, subDirectoryRouter, dotMiddlewares));
+			middlewares.push(
+				treeRoutingMiddleware(itemPath, subDirectoryRouter, dotMiddlewares)
+			);
 			baseRouter.use(`/${item}`, middlewares);
 		}
 
