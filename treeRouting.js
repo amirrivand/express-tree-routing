@@ -10,7 +10,26 @@ const { sortDirectoryListing } = require("./utils/sorter");
  * @param {{dotname: string; middleware: import("express").RequestHandler<{}, any, any, qs.ParsedQs, Record<string, any>>}[]} dotMiddlewares
  * @returns
  */
-function treeRoutingMiddleware(baseDirectory, baseRouter, dotMiddlewares = []) {
+function treeRoutingMiddleware(props = {
+	dotMiddlewares: [],
+	baseRouter: undefined,
+	baseDirectory: undefined,
+	caseSensitive: false,
+	passParamsToChild: false
+}) {
+
+	const { baseDirectory, baseRouter, dotMiddlewares, caseSensitive, passParamsToChild } = props;
+
+	const routerOptions = {}
+
+	if (caseSensitive) {
+		routerOptions.caseSensitive = true;
+	}
+
+	if (passParamsToChild) {
+		routerOptions.mergeParams = true;
+	}
+
 	// list files in directory
 	const listCurrentDirectory = fs
 		.readdirSync(baseDirectory)
@@ -22,7 +41,7 @@ function treeRoutingMiddleware(baseDirectory, baseRouter, dotMiddlewares = []) {
 
 		// directory
 		if (itemStatus.isDirectory()) {
-			const subDirectoryRouter = Router();
+			const subDirectoryRouter = Router(routerOptions);
 			let middlewares = [];
 			const middlewarePath = path.join(itemPath, "middleware.js");
 			if (fs.existsSync(middlewarePath)) {
@@ -42,7 +61,7 @@ function treeRoutingMiddleware(baseDirectory, baseRouter, dotMiddlewares = []) {
 
 		// file
 		if (itemStatus.isFile() && item.endsWith(".js")) {
-			const subRoutesRouter = Router();
+			const subRoutesRouter = Router(routerOptions);
 			const middlewares = [];
 			dotMiddlewares.forEach((mdl) => {
 				if (item.includes(mdl.dotname)) {
