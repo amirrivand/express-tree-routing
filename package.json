@@ -1,7 +1,7 @@
 {
   "name": "express-tree-routing",
   "displayName": "Express Tree Routing",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "An express-js middleware that creates routing addresses for applications using the tree structure of their parent directories.",
   "main": "index.js",
   "type": "commonjs",

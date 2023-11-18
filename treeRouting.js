@@ -44,7 +44,7 @@ function treeRoutingMiddleware(config = defaultConfig) {
 	 */
 	function mapDirectory(directory) {
 		const directorySubRouter = Router(routerOptions);
-		const middlewaresAndHandler = [];
+		let middlewaresAndHandler = [];
 		const middlewarePath = path.join(directory.itemPath, "middleware.js");
 		if (fs.existsSync(middlewarePath)) {
 			const directoryMiddlewares = require(middlewarePath);
